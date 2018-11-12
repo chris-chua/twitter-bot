@@ -40,7 +40,11 @@ class App:
 
     def follow_followers(self):
         for follower in tweepy.Cursor(self.api.followers).items():
-            follower.follow()
+            try:
+                follower.follow()
+
+            except tweepy.TweepError as e:
+                print(e.reason)
 
 
     def retweet_keyword(self, keywords, num_tweets=10):

@@ -31,14 +31,14 @@ class App:
 
     def main(self):
         while True:
-            APP_PAUSE_TIME = 60
-            self.follow_followers()
+            APP_PAUSE_TIME = 5 * 60
             if self.keywords is not None:
                 self.retweet_keyword(self.keywords)
             sleep(APP_PAUSE_TIME)
 
 
     def follow_followers(self):
+        print('Looking for followers to follow.')
         for follower in tweepy.Cursor(self.api.followers).items():
             try:
                 follower.follow()
@@ -48,6 +48,7 @@ class App:
 
 
     def retweet_keyword(self, keywords, num_tweets=10):
+        print('\nLooking for tweets with matched keywords to RT.')
         for tweet in tweepy.Cursor(self.api.search, self.keywords).items(num_tweets):
             try:
                 username = tweet.user.screen_name
@@ -61,7 +62,23 @@ class App:
                 break
 
 
+    def favorite_keyword(self, keywords, num_tweets=10):
+        print('Looking for tweets with matched keywords to favorite.')
+        for tweet in tweepy.Cursor(self.api.search, self.keywords).items(num_tweets):
+            try:
+                username = tweet.user.screen_name
+                tweet.favorite()
+                print('Favorite tweet: ' + username)
+
+            except tweepy.TweepError as e:
+                print(e.reason)
+
+            except StopIteration:
+                break
+
+
     def reply_keyword(self, keywords, num_tweets=5, phrase=None):
+        print('Looking for tweets with matched keywords to reply.')
         for tweet in tweepy.Cursor(self.api.search, self.keywords).items(num_tweets):
             try:
                 tweetId = tweet.user.id
@@ -78,4 +95,4 @@ class App:
 
 
 if __name__ == '__main__':
-    app = App(keywords=['#DataScience', '#MachineLearning', '#NaturalLanguageProcessing', '#DeepLearning'])
+    app = App(keywords=('#DataScience OR #MachineLearning OR #NaturalLanguageProcessing OR #DeepLearning OR #NeuralNetwork OR #NeuralNetworks'))
